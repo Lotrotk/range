@@ -3,7 +3,8 @@ set(headers
 )
 
 set(sources
-	range_test.cpp
+	range_integers_test.cpp
+	range_iterators_test.cpp
 )
 
 add_executable(rangetest ${headers} ${sources})
