@@ -21,6 +21,9 @@ namespace rng
 	class iterator
 	{
 	public:
+		using value_t = std::array<T, N>;
+
+	private:
 		using range_t = range<T>;
 		
 	public:
@@ -29,7 +32,7 @@ namespace rng
 	
 		iterator &operator++();
 		
-		std::array<T, N> const &operator*() const { return _array; }
+        value_t const &operator*() const { return _array; }
 		bool operator!=(iterator const &other) const { return _array != other._array; }
 		
 	private:
@@ -37,7 +40,7 @@ namespace rng
 		
 	private:
 		range_t const *_range{};
-		std::array<T, N> _array;
+		value_t _array;
 		
 	private:
 		template<bool, size_t, typename> friend class iterable;
@@ -64,6 +67,7 @@ namespace rng
 	public:
 		using range_t = range<T>;
 		using iterator_t = iterator<unique, N, T>;
+		using value_t = typename iterator_t::value_t;
 		
 	public:
 		constexpr iterable(range_t const &r) : _range(r) {}
