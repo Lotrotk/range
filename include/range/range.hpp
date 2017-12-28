@@ -24,8 +24,8 @@ namespace rng
 		using range_t = range<T>;
 		
 	public:
-        iterator(iterator &&other) = default;
-        iterator &operator=(iterator &&other) = default;
+		iterator(iterator &&other) = default;
+		iterator &operator=(iterator &&other) = default;
 	
 		iterator &operator++();
 		
@@ -95,8 +95,7 @@ namespace rng
 	{	
 		if(!unique)
 		{
-            iterator_t x(_range, _range._begin);
-            return x;
+			return iterator_t(_range, _range._begin);
 		}
 		
 		if(rngdistance(_range._begin, _range._end) < N)

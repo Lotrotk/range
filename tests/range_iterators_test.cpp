@@ -83,9 +83,9 @@ namespace
 		
 		range<iterator_t> const r(_list.begin(), _list.end());
 		
-        size_t index = 0;
-        for(value_t const &comb : iterable<false, 3, iterator_t>(r))
-        {
+		size_t index = 0;
+		for(value_t const &comb : iterable<false, 3, iterator_t>(r))
+		{
 			EXPECT_TRUE(index < expected.size());
 			EXPECT_EQ(comb, expected[index]);
 			++index;
