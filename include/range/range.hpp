@@ -1,7 +1,8 @@
 #pragma once
 
-#include <cstdint>
+#include <algorithm>
 #include <array>
+#include <cstdint>
 #include <type_traits>
 
 namespace rng
@@ -15,15 +16,19 @@ namespace rng
 	template<bool separate, size_t N, typename T>
 	class iterator;
 	
+	template<size_t N, typename T>
+	using value = std::array<T, N>;
+	
+	template<size_t N, typename T>
+	bool has_empty_range(value<N, T> const&, range<T> const&);
+	
 	////////////////////////////////////////////////////////////////
 	
 	template<bool separate, size_t N, typename T>
 	class iterator
 	{
 	public:
-		using value_t = std::array<T, N>;
-
-	private:
+		using value_t = value<N, T>;
 		using range_t = range<T>;
 		
 	public:
@@ -59,6 +64,7 @@ namespace rng
 	private:
 		template<bool, size_t, typename> friend class iterable;
 		template<bool, size_t, typename> friend class iterator;
+		template<size_t N, typename U> friend bool has_empty_range(value<N, U> const&, range<U> const&);
 	};
 	
 	template<bool separate, size_t N, typename T>
@@ -157,5 +163,11 @@ namespace rng
 		}
 		
 		return res;
+	}
+	
+	template<size_t N, typename T>
+	bool has_empty_range(value<N, T> const &v, range<T> const &r)
+	{
+		return std::any_of(v.begin(), v.end(), [&r](T const &t) { return t == r._end; }) || std::adjacent_find(v.begin(), v.end()) != v.end();
 	}
 }
