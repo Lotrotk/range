@@ -38,53 +38,74 @@ namespace
 		iterator_t _iterators[5];
 	};
 	
-	using value_t = std::array<iterator_t, 3>;
+	using split_t = split<3, iterator_t>;
 	
-	TEST_F(RangeIteratorsTest, CorrectNotUniqueRange) {
+	TEST_F(RangeIteratorsTest, CorrectOverlappingRange) {
 		
-		std::array<value_t, 35> const expected
+		std::array<split_t, 56> const expected
 		{
-			value_t{_iterators[0], _iterators[0], _iterators[0],},
-			value_t{_iterators[0], _iterators[0], _iterators[1],},
-			value_t{_iterators[0], _iterators[0], _iterators[2],},
-			value_t{_iterators[0], _iterators[0], _iterators[3],},
-			value_t{_iterators[0], _iterators[0], _iterators[4],},
-			value_t{_iterators[0], _iterators[1], _iterators[1],},
-			value_t{_iterators[0], _iterators[1], _iterators[2],},
-			value_t{_iterators[0], _iterators[1], _iterators[3],},
-			value_t{_iterators[0], _iterators[1], _iterators[4],},
-			value_t{_iterators[0], _iterators[2], _iterators[2],},
-			value_t{_iterators[0], _iterators[2], _iterators[3],},
-			value_t{_iterators[0], _iterators[2], _iterators[4],},
-			value_t{_iterators[0], _iterators[3], _iterators[3],},
-			value_t{_iterators[0], _iterators[3], _iterators[4],},
-			value_t{_iterators[0], _iterators[4], _iterators[4],},
-			value_t{_iterators[1], _iterators[1], _iterators[1],},
-			value_t{_iterators[1], _iterators[1], _iterators[2],},
-			value_t{_iterators[1], _iterators[1], _iterators[3],},
-			value_t{_iterators[1], _iterators[1], _iterators[4],},
-			value_t{_iterators[1], _iterators[2], _iterators[2],},
-			value_t{_iterators[1], _iterators[2], _iterators[3],},
-			value_t{_iterators[1], _iterators[2], _iterators[4],},
-			value_t{_iterators[1], _iterators[3], _iterators[3],},
-			value_t{_iterators[1], _iterators[3], _iterators[4],},
-			value_t{_iterators[1], _iterators[4], _iterators[4],},
-			value_t{_iterators[2], _iterators[2], _iterators[2],},
-			value_t{_iterators[2], _iterators[2], _iterators[3],},
-			value_t{_iterators[2], _iterators[2], _iterators[4],},
-			value_t{_iterators[2], _iterators[3], _iterators[3],},
-			value_t{_iterators[2], _iterators[3], _iterators[4],},
-			value_t{_iterators[2], _iterators[4], _iterators[4],},
-			value_t{_iterators[3], _iterators[3], _iterators[3],},
-			value_t{_iterators[3], _iterators[3], _iterators[4],},
-			value_t{_iterators[3], _iterators[4], _iterators[4],},
-			value_t{_iterators[4], _iterators[4], _iterators[4],},
+			split_t{_iterators[0], _iterators[0], _iterators[0],},
+			split_t{_iterators[0], _iterators[0], _iterators[1],},
+			split_t{_iterators[0], _iterators[0], _iterators[2],},
+			split_t{_iterators[0], _iterators[0], _iterators[3],},
+			split_t{_iterators[0], _iterators[0], _iterators[4],},
+			split_t{_iterators[0], _iterators[0], _list.end(),},
+			split_t{_iterators[0], _iterators[1], _iterators[1],},
+			split_t{_iterators[0], _iterators[1], _iterators[2],},
+			split_t{_iterators[0], _iterators[1], _iterators[3],},
+			split_t{_iterators[0], _iterators[1], _iterators[4],},
+			split_t{_iterators[0], _iterators[1], _list.end(),},
+			split_t{_iterators[0], _iterators[2], _iterators[2],},
+			split_t{_iterators[0], _iterators[2], _iterators[3],},
+			split_t{_iterators[0], _iterators[2], _iterators[4],},
+			split_t{_iterators[0], _iterators[2], _list.end(),},
+			split_t{_iterators[0], _iterators[3], _iterators[3],},
+			split_t{_iterators[0], _iterators[3], _iterators[4],},
+			split_t{_iterators[0], _iterators[3], _list.end(),},
+			split_t{_iterators[0], _iterators[4], _iterators[4],},
+			split_t{_iterators[0], _iterators[4], _list.end(),},
+			split_t{_iterators[0], _list.end(), _list.end(),},
+			split_t{_iterators[1], _iterators[1], _iterators[1],},
+			split_t{_iterators[1], _iterators[1], _iterators[2],},
+			split_t{_iterators[1], _iterators[1], _iterators[3],},
+			split_t{_iterators[1], _iterators[1], _iterators[4],},
+			split_t{_iterators[1], _iterators[1], _list.end(),},
+			split_t{_iterators[1], _iterators[2], _iterators[2],},
+			split_t{_iterators[1], _iterators[2], _iterators[3],},
+			split_t{_iterators[1], _iterators[2], _iterators[4],},
+			split_t{_iterators[1], _iterators[2], _list.end(),},
+			split_t{_iterators[1], _iterators[3], _iterators[3],},
+			split_t{_iterators[1], _iterators[3], _iterators[4],},
+			split_t{_iterators[1], _iterators[3], _list.end(),},
+			split_t{_iterators[1], _iterators[4], _iterators[4],},
+			split_t{_iterators[1], _iterators[4], _list.end(),},
+			split_t{_iterators[1], _list.end(), _list.end(),},
+			split_t{_iterators[2], _iterators[2], _iterators[2],},
+			split_t{_iterators[2], _iterators[2], _iterators[3],},
+			split_t{_iterators[2], _iterators[2], _iterators[4],},
+			split_t{_iterators[2], _iterators[2], _list.end(),},
+			split_t{_iterators[2], _iterators[3], _iterators[3],},
+			split_t{_iterators[2], _iterators[3], _iterators[4],},
+			split_t{_iterators[2], _iterators[3], _list.end(),},
+			split_t{_iterators[2], _iterators[4], _iterators[4],},
+			split_t{_iterators[2], _iterators[4], _list.end(),},
+			split_t{_iterators[2], _list.end(), _list.end(),},
+			split_t{_iterators[3], _iterators[3], _iterators[3],},
+			split_t{_iterators[3], _iterators[3], _iterators[4],},
+			split_t{_iterators[3], _iterators[3], _list.end(),},
+			split_t{_iterators[3], _iterators[4], _iterators[4],},
+			split_t{_iterators[3], _iterators[4], _list.end(),},
+			split_t{_iterators[3], _list.end(), _list.end(),},
+			split_t{_iterators[4], _iterators[4], _iterators[4],},
+			split_t{_iterators[4], _iterators[4], _list.end(),},
+			split_t{_iterators[4], _list.end(), _list.end(),},
+			split_t{_list.end(), _list.end(), _list.end(),},
 		};
 		
 		range<iterator_t> const r(_list.begin(), _list.end());
 		
 		size_t index = 0;
-		for(value_t const &comb : iterable<false, 3, iterator_t>(r))
+		for(split_t const &comb : iterable<false, 3, iterator_t>(r))
 		{
 			EXPECT_TRUE(index < expected.size());
 			EXPECT_EQ(comb, expected[index]);
@@ -93,31 +114,106 @@ namespace
 		EXPECT_EQ(index, expected.size());
 	}
 	
-	TEST_F(RangeIteratorsTest, CorrectUniqueRange) {
+	TEST_F(RangeIteratorsTest, CorrectRange) {
 		
-		std::array<value_t, 10> const expected
+		std::array<split_t, 15> const expected
 		{
-			value_t{_iterators[0], _iterators[1], _iterators[2],},
-			value_t{_iterators[0], _iterators[1], _iterators[3],},
-			value_t{_iterators[0], _iterators[1], _iterators[4],},
-			value_t{_iterators[0], _iterators[2], _iterators[3],},
-			value_t{_iterators[0], _iterators[2], _iterators[4],},
-			value_t{_iterators[0], _iterators[3], _iterators[4],},
-			value_t{_iterators[1], _iterators[2], _iterators[3],},
-			value_t{_iterators[1], _iterators[2], _iterators[4],},
-			value_t{_iterators[1], _iterators[3], _iterators[4],},
-			value_t{_iterators[2], _iterators[3], _iterators[4],},
+			split_t{_iterators[1], _iterators[2], _iterators[3],},
+			split_t{_iterators[1], _iterators[2], _iterators[4],},
+			split_t{_iterators[1], _iterators[2], _list.end(),},
+			split_t{_iterators[1], _iterators[3], _iterators[4],},
+			split_t{_iterators[1], _iterators[3], _list.end(),},
+			split_t{_iterators[1], _iterators[4], _list.end(),},
+			split_t{_iterators[1], _list.end(), _list.end(),},
+			split_t{_iterators[2], _iterators[3], _iterators[4],},
+			split_t{_iterators[2], _iterators[3], _list.end(),},
+			split_t{_iterators[2], _iterators[4], _list.end(),},
+			split_t{_iterators[2], _list.end(), _list.end(),},
+			split_t{_iterators[3], _iterators[4], _list.end(),},
+			split_t{_iterators[3], _list.end(), _list.end(),},
+			split_t{_iterators[4], _list.end(), _list.end(),},
+			split_t{_list.end(), _list.end(), _list.end(),},
 		};
 		
 		range<iterator_t> const r(_list.begin(), _list.end());
 		
 		size_t index = 0;
-		for(value_t const &comb : iterable<true, 3, iterator_t>(r))
+		for(split_t const &comb : iterable<true, 3, iterator_t>(r))
 		{
 			EXPECT_TRUE(index < expected.size());
 			EXPECT_EQ(comb, expected[index]);
 			++index;
 		}
 		EXPECT_EQ(index, expected.size());
+	}
+	
+	TEST_F(RangeIteratorsTest, has_empty_range) {
+		
+		std::array<std::pair<split_t, bool>, 56> const splits
+		{
+			std::make_pair(split_t{_iterators[0], _iterators[0], _iterators[0],}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[0], _iterators[1],}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[0], _iterators[2],}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[0], _iterators[3],}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[0], _iterators[4],}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[0], _list.end(),}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[1], _iterators[1],}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[1], _iterators[2],}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[1], _iterators[3],}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[1], _iterators[4],}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[1], _list.end(),}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[2], _iterators[2],}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[2], _iterators[3],}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[2], _iterators[4],}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[2], _list.end(),}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[3], _iterators[3],}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[3], _iterators[4],}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[3], _list.end(),}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[4], _iterators[4],}, true),
+			std::make_pair(split_t{_iterators[0], _iterators[4], _list.end(),}, true),
+			std::make_pair(split_t{_iterators[0], _list.end(), _list.end(),}, true),
+			std::make_pair(split_t{_iterators[1], _iterators[1], _iterators[1],}, true),
+			std::make_pair(split_t{_iterators[1], _iterators[1], _iterators[2],}, true),
+			std::make_pair(split_t{_iterators[1], _iterators[1], _iterators[3],}, true),
+			std::make_pair(split_t{_iterators[1], _iterators[1], _iterators[4],}, true),
+			std::make_pair(split_t{_iterators[1], _iterators[1], _list.end(),}, true),
+			std::make_pair(split_t{_iterators[1], _iterators[2], _iterators[2],}, true),
+			std::make_pair(split_t{_iterators[1], _iterators[2], _iterators[3],}, false),
+			std::make_pair(split_t{_iterators[1], _iterators[2], _iterators[4],}, false),
+			std::make_pair(split_t{_iterators[1], _iterators[2], _list.end(),}, true),
+			std::make_pair(split_t{_iterators[1], _iterators[3], _iterators[3],}, true),
+			std::make_pair(split_t{_iterators[1], _iterators[3], _iterators[4],}, false),
+			std::make_pair(split_t{_iterators[1], _iterators[3], _list.end(),}, true),
+			std::make_pair(split_t{_iterators[1], _iterators[4], _iterators[4],}, true),
+			std::make_pair(split_t{_iterators[1], _iterators[4], _list.end(),}, true),
+			std::make_pair(split_t{_iterators[1], _list.end(), _list.end(),}, true),
+			std::make_pair(split_t{_iterators[2], _iterators[2], _iterators[2],}, true),
+			std::make_pair(split_t{_iterators[2], _iterators[2], _iterators[3],}, true),
+			std::make_pair(split_t{_iterators[2], _iterators[2], _iterators[4],}, true),
+			std::make_pair(split_t{_iterators[2], _iterators[2], _list.end(),}, true),
+			std::make_pair(split_t{_iterators[2], _iterators[3], _iterators[3],}, true),
+			std::make_pair(split_t{_iterators[2], _iterators[3], _iterators[4],}, false),
+			std::make_pair(split_t{_iterators[2], _iterators[3], _list.end(),}, true),
+			std::make_pair(split_t{_iterators[2], _iterators[4], _iterators[4],}, true),
+			std::make_pair(split_t{_iterators[2], _iterators[4], _list.end(),}, true),
+			std::make_pair(split_t{_iterators[2], _list.end(), _list.end(),}, true),
+			std::make_pair(split_t{_iterators[3], _iterators[3], _iterators[3],}, true),
+			std::make_pair(split_t{_iterators[3], _iterators[3], _iterators[4],}, true),
+			std::make_pair(split_t{_iterators[3], _iterators[3], _list.end(),}, true),
+			std::make_pair(split_t{_iterators[3], _iterators[4], _iterators[4],}, true),
+			std::make_pair(split_t{_iterators[3], _iterators[4], _list.end(),}, true),
+			std::make_pair(split_t{_iterators[3], _list.end(), _list.end(),}, true),
+			std::make_pair(split_t{_iterators[4], _iterators[4], _iterators[4],}, true),
+			std::make_pair(split_t{_iterators[4], _iterators[4], _list.end(),}, true),
+			std::make_pair(split_t{_iterators[4], _list.end(), _list.end(),}, true),
+			std::make_pair(split_t{_list.end(), _list.end(), _list.end(),}, true),
+		};
+		
+		range<iterator_t> const r(_list.begin(), _list.end());
+
+		for(auto const &pair : splits)
+		{
+			EXPECT_EQ(has_empty_range(pair.first, r), pair.second);
+		}
 	}
 }

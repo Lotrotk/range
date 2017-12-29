@@ -1,7 +1,8 @@
 #pragma once
 
-#include <cstdint>
+#include <algorithm>
 #include <array>
+#include <cstdint>
 #include <type_traits>
 
 namespace rng
@@ -9,21 +10,25 @@ namespace rng
 	template<typename T>
 	class range;
 	
-	template<bool unique, size_t N, typename T>
+	template<bool separate, size_t N, typename T>
 	class iterable;
 	
-	template<bool unique, size_t N, typename T>
+	template<bool separate, size_t N, typename T>
 	class iterator;
+	
+	template<size_t N, typename T>
+	using split = std::array<T, N>;
+	
+	template<size_t N, typename T>
+	bool has_empty_range(split<N, T> const&, range<T> const&);
 	
 	////////////////////////////////////////////////////////////////
 	
-	template<bool unique, size_t N, typename T>
+	template<bool separate, size_t N, typename T>
 	class iterator
 	{
 	public:
-		using value_t = std::array<T, N>;
-
-	private:
+		using split_t = split<N, T>;
 		using range_t = range<T>;
 		
 	public:
@@ -32,7 +37,7 @@ namespace rng
 	
 		iterator &operator++();
 		
-        value_t const &operator*() const { return _array; }
+        split_t const &operator*() const { return _array; }
 		bool operator!=(iterator const &other) const { return _array != other._array; }
 		
 	private:
@@ -40,7 +45,7 @@ namespace rng
 		
 	private:
 		range_t const *_range{};
-		value_t _array;
+		split_t _array;
 		
 	private:
 		template<bool, size_t, typename> friend class iterable;
@@ -59,15 +64,17 @@ namespace rng
 	private:
 		template<bool, size_t, typename> friend class iterable;
 		template<bool, size_t, typename> friend class iterator;
+		template<size_t N, typename U> friend bool has_empty_range(split<N, U> const&, range<U> const&);
 	};
 	
-	template<bool unique, size_t N, typename T>
+	template<bool separate, size_t N, typename T>
 	class iterable
 	{
+		static_assert(N > 0, "There must be at least one subrange");
 	public:
 		using range_t = range<T>;
-		using iterator_t = iterator<unique, N, T>;
-		using value_t = typename iterator_t::value_t;
+		using iterator_t = iterator<separate, N, T>;
+		using split_t = typename iterator_t::split_t;
 		
 	public:
 		constexpr iterable(range_t const &r) : _range(r) {}
@@ -94,74 +101,78 @@ namespace rng
 	template<typename T, typename std::enable_if<!std::is_integral<T>::value, int>::type = 0>
 	void rngadvance(T &a, size_t const d) { using std::advance; advance(a, d); }
 	
-	template<bool unique, size_t N, typename T>
-	typename iterable<unique, N, T>::iterator_t iterable<unique, N, T>::begin() const
-	{	
-		if(!unique)
+	template<bool separate, size_t N, typename T>
+	typename iterable<separate, N, T>::iterator_t iterable<separate, N, T>::begin() const
+	{
+		iterator_t res(_range, _range._begin);	
+		if(separate)
 		{
-			return iterator_t(_range, _range._begin);
+			size_t const R = rngdistance(_range._begin, _range._end);
+			for(size_t i=0; i <N; ++i)
+			{
+				if(i + 1 < R)
+				{
+					rngadvance(res._array[i], i + 1);
+				}
+				else
+				{
+					res._array[i] = _range._end;
+				}
+			}
 		}
-		
-		if(rngdistance(_range._begin, _range._end) < N)
-		{
-			return end();
-		}
-		
-		iterator_t res(_range, _range._begin);
-		for(size_t i = 0; i < N; ++i)
-		{
-			rngadvance(res._array[i], i);
-		}
-		
+				
 		return res;
 	}
 	
-	template<bool unique, size_t N, typename T>
-	typename iterable<unique, N, T>::iterator_t iterable<unique, N, T>::end() const
+	template<bool separate, size_t N, typename T>
+	typename iterable<separate, N, T>::iterator_t iterable<separate, N, T>::end() const
 	{
 		iterator_t res(_range, _range._begin);
 		res._array[0] = _range._end;
 		return res;
 	}
 	
-	template<bool unique, size_t N, typename T>
-	iterator<unique, N, T> &iterator<unique, N, T>::operator++()
+	template<bool separate, size_t N, typename T>
+	iterator<separate, N, T> &iterator<separate, N, T>::operator++()
 	{
 		iterator &res = *this;
-				
-		for(size_t i = 1; i <= N; ++i)
+		
+		size_t i = 1;
+		for(; i <= N; ++i)
 		{
-			rngadvance(res._array[N-i], size_t(1));
 			if(res._array[N-i] == res._range->_end)
 			{
 				if(i == N)
 				{
-					res = iterable<unique, N, T>(*_range).end();
+					res = iterable<separate, N, T>(*_range).end();
 					return res;
 				}
 				continue;
-			}
-			
-			if(unique && rngdistance(res._array[N-i], res._range->_end) < i)
-			{
-				if(i == N)
-				{
-					res = iterable<unique, N, T>(*_range).end();
-					return res;
-				}
-				continue;
-			}
-			for(size_t j = N-i+1; j<N; ++j)
-			{
-				res._array[j] = res._array[j-1];
-				if(unique)
-				{
-					rngadvance(res._array[j], size_t(1));
-				}
 			}
 			break;
 		}
+			
+		rngadvance(res._array[N-i], size_t(1));
+		for(size_t j = N-i+1; j<N; ++j)
+		{
+			res._array[j] = res._array[j-1];
+			if(separate && res._array[j] != res._range->_end)
+			{
+				rngadvance(res._array[j], size_t(1));
+			}
+		}
 		
 		return res;
+	}
+	
+	template<size_t N, typename T>
+	bool has_empty_range(split<N, T> const &v, range<T> const &r)
+	{
+		return
+			v.front() == r._begin
+			||
+			std::any_of(v.begin(), v.end(), [&r](T const &t) { return t == r._end; })
+			||
+			std::adjacent_find(v.begin(), v.end()) != v.end();
 	}
 }
