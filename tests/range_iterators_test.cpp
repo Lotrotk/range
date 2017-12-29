@@ -2,9 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <array>
 #include <list>
-#include <ostream>
 #include <string>
 
 using namespace testing;

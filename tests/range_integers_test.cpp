@@ -2,8 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <array>
-
 using namespace testing;
 using namespace rng;
 
