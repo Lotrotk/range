@@ -13,7 +13,7 @@ namespace
 	
 	using value_t = std::array<int, 3>;
 	
-	TEST(RangeIntegersTest, CorrectNotUniqueRange) {
+	TEST(RangeIntegersTest, CorrectOverlappingRange) {
 		
 		std::array<value_t, 35> const expected
 		{
@@ -64,7 +64,7 @@ namespace
 		EXPECT_EQ(index, expected.size());
 	}
 	
-	TEST(RangeIntegersTest, CorrectUniqueRange) {
+	TEST(RangeIntegersTest, CorrectRange) {
 		
 		std::array<value_t, 10> const expected
 		{

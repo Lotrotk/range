@@ -9,15 +9,15 @@ namespace rng
 	template<typename T>
 	class range;
 	
-	template<bool unique, size_t N, typename T>
+	template<bool separate, size_t N, typename T>
 	class iterable;
 	
-	template<bool unique, size_t N, typename T>
+	template<bool separate, size_t N, typename T>
 	class iterator;
 	
 	////////////////////////////////////////////////////////////////
 	
-	template<bool unique, size_t N, typename T>
+	template<bool separate, size_t N, typename T>
 	class iterator
 	{
 	public:
@@ -61,12 +61,12 @@ namespace rng
 		template<bool, size_t, typename> friend class iterator;
 	};
 	
-	template<bool unique, size_t N, typename T>
+	template<bool separate, size_t N, typename T>
 	class iterable
 	{
 	public:
 		using range_t = range<T>;
-		using iterator_t = iterator<unique, N, T>;
+		using iterator_t = iterator<separate, N, T>;
 		using value_t = typename iterator_t::value_t;
 		
 	public:
@@ -94,10 +94,10 @@ namespace rng
 	template<typename T, typename std::enable_if<!std::is_integral<T>::value, int>::type = 0>
 	void rngadvance(T &a, size_t const d) { using std::advance; advance(a, d); }
 	
-	template<bool unique, size_t N, typename T>
-	typename iterable<unique, N, T>::iterator_t iterable<unique, N, T>::begin() const
+	template<bool separate, size_t N, typename T>
+	typename iterable<separate, N, T>::iterator_t iterable<separate, N, T>::begin() const
 	{	
-		if(!unique)
+		if(!separate)
 		{
 			return iterator_t(_range, _range._begin);
 		}
@@ -116,16 +116,16 @@ namespace rng
 		return res;
 	}
 	
-	template<bool unique, size_t N, typename T>
-	typename iterable<unique, N, T>::iterator_t iterable<unique, N, T>::end() const
+	template<bool separate, size_t N, typename T>
+	typename iterable<separate, N, T>::iterator_t iterable<separate, N, T>::end() const
 	{
 		iterator_t res(_range, _range._begin);
 		res._array[0] = _range._end;
 		return res;
 	}
 	
-	template<bool unique, size_t N, typename T>
-	iterator<unique, N, T> &iterator<unique, N, T>::operator++()
+	template<bool separate, size_t N, typename T>
+	iterator<separate, N, T> &iterator<separate, N, T>::operator++()
 	{
 		iterator &res = *this;
 				
@@ -136,17 +136,17 @@ namespace rng
 			{
 				if(i == N)
 				{
-					res = iterable<unique, N, T>(*_range).end();
+					res = iterable<separate, N, T>(*_range).end();
 					return res;
 				}
 				continue;
 			}
 			
-			if(unique && rngdistance(res._array[N-i], res._range->_end) < i)
+			if(separate && rngdistance(res._array[N-i], res._range->_end) < i)
 			{
 				if(i == N)
 				{
-					res = iterable<unique, N, T>(*_range).end();
+					res = iterable<separate, N, T>(*_range).end();
 					return res;
 				}
 				continue;
@@ -154,7 +154,7 @@ namespace rng
 			for(size_t j = N-i+1; j<N; ++j)
 			{
 				res._array[j] = res._array[j-1];
-				if(unique)
+				if(separate)
 				{
 					rngadvance(res._array[j], size_t(1));
 				}
