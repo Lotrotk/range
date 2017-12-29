@@ -64,6 +64,7 @@ namespace rng
 	template<bool separate, size_t N, typename T>
 	class iterable
 	{
+		static_assert(N > 0, "There must be at least one subrange");
 	public:
 		using range_t = range<T>;
 		using iterator_t = iterator<separate, N, T>;
@@ -96,23 +97,24 @@ namespace rng
 	
 	template<bool separate, size_t N, typename T>
 	typename iterable<separate, N, T>::iterator_t iterable<separate, N, T>::begin() const
-	{	
-		if(!separate)
+	{
+		iterator_t res(_range, _range._begin);	
+		if(separate)
 		{
-			return iterator_t(_range, _range._begin);
+			size_t const R = rngdistance(_range._begin, _range._end);
+			for(size_t i=0; i <N; ++i)
+			{
+				if(i < R)
+				{
+					rngadvance(res._array[i], i);
+				}
+				else
+				{
+					res._array[i] = _range._end;
+				}
+			}
 		}
-		
-		if(rngdistance(_range._begin, _range._end) < N)
-		{
-			return end();
-		}
-		
-		iterator_t res(_range, _range._begin);
-		for(size_t i = 0; i < N; ++i)
-		{
-			rngadvance(res._array[i], i);
-		}
-		
+				
 		return res;
 	}
 	
@@ -128,10 +130,10 @@ namespace rng
 	iterator<separate, N, T> &iterator<separate, N, T>::operator++()
 	{
 		iterator &res = *this;
-				
-		for(size_t i = 1; i <= N; ++i)
+		
+		size_t i = 1;
+		for(; i <= N; ++i)
 		{
-			rngadvance(res._array[N-i], size_t(1));
 			if(res._array[N-i] == res._range->_end)
 			{
 				if(i == N)
@@ -141,25 +143,17 @@ namespace rng
 				}
 				continue;
 			}
-			
-			if(separate && rngdistance(res._array[N-i], res._range->_end) < i)
-			{
-				if(i == N)
-				{
-					res = iterable<separate, N, T>(*_range).end();
-					return res;
-				}
-				continue;
-			}
-			for(size_t j = N-i+1; j<N; ++j)
-			{
-				res._array[j] = res._array[j-1];
-				if(separate)
-				{
-					rngadvance(res._array[j], size_t(1));
-				}
-			}
 			break;
+		}
+			
+		rngadvance(res._array[N-i], size_t(1));
+		for(size_t j = N-i+1; j<N; ++j)
+		{
+			res._array[j] = res._array[j-1];
+			if(separate && res._array[j] != res._range->_end)
+			{
+				rngadvance(res._array[j], size_t(1));
+			}
 		}
 		
 		return res;
