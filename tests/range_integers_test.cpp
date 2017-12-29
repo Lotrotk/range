@@ -87,19 +87,8 @@ namespace
 
 	TEST(RangeIntegersTest, CorrectRange) {
 		
-		std::array<value_t, 26> const expected
+		std::array<value_t, 15> const expected
 		{
-			value_t{0, 1, 2,},
-			value_t{0, 1, 3,},
-			value_t{0, 1, 4,},
-			value_t{0, 1, 5,},
-			value_t{0, 2, 3,},
-			value_t{0, 2, 4,},
-			value_t{0, 2, 5,},
-			value_t{0, 3, 4,},
-			value_t{0, 3, 5,},
-			value_t{0, 4, 5,},
-			value_t{0, 5, 5,},
 			value_t{1, 2, 3,},
 			value_t{1, 2, 4,},
 			value_t{1, 2, 5,},
@@ -138,16 +127,16 @@ namespace
 			std::make_pair(value_t{0, 0, 4,}, true),
 			std::make_pair(value_t{0, 0, 5,}, true),
 			std::make_pair(value_t{0, 1, 1,}, true),
-			std::make_pair(value_t{0, 1, 2,}, false),
-			std::make_pair(value_t{0, 1, 3,}, false),
-			std::make_pair(value_t{0, 1, 4,}, false),
+			std::make_pair(value_t{0, 1, 2,}, true),
+			std::make_pair(value_t{0, 1, 3,}, true),
+			std::make_pair(value_t{0, 1, 4,}, true),
 			std::make_pair(value_t{0, 1, 5,}, true),
 			std::make_pair(value_t{0, 2, 2,}, true),
-			std::make_pair(value_t{0, 2, 3,}, false),
-			std::make_pair(value_t{0, 2, 4,}, false),
+			std::make_pair(value_t{0, 2, 3,}, true),
+			std::make_pair(value_t{0, 2, 4,}, true),
 			std::make_pair(value_t{0, 2, 5,}, true),
 			std::make_pair(value_t{0, 3, 3,}, true),
-			std::make_pair(value_t{0, 3, 4,}, false),
+			std::make_pair(value_t{0, 3, 4,}, true),
 			std::make_pair(value_t{0, 3, 5,}, true),
 			std::make_pair(value_t{0, 4, 4,}, true),
 			std::make_pair(value_t{0, 4, 5,}, true),

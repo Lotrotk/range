@@ -110,9 +110,9 @@ namespace rng
 			size_t const R = rngdistance(_range._begin, _range._end);
 			for(size_t i=0; i <N; ++i)
 			{
-				if(i < R)
+				if(i + 1 < R)
 				{
-					rngadvance(res._array[i], i);
+					rngadvance(res._array[i], i + 1);
 				}
 				else
 				{
@@ -168,6 +168,11 @@ namespace rng
 	template<size_t N, typename T>
 	bool has_empty_range(value<N, T> const &v, range<T> const &r)
 	{
-		return std::any_of(v.begin(), v.end(), [&r](T const &t) { return t == r._end; }) || std::adjacent_find(v.begin(), v.end()) != v.end();
+		return
+			v.front() == r._begin
+			||
+			std::any_of(v.begin(), v.end(), [&r](T const &t) { return t == r._end; })
+			||
+			std::adjacent_find(v.begin(), v.end()) != v.end();
 	}
 }

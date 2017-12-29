@@ -116,19 +116,8 @@ namespace
 	
 	TEST_F(RangeIteratorsTest, CorrectRange) {
 		
-		std::array<value_t, 26> const expected
+		std::array<value_t, 15> const expected
 		{
-			value_t{_iterators[0], _iterators[1], _iterators[2],},
-			value_t{_iterators[0], _iterators[1], _iterators[3],},
-			value_t{_iterators[0], _iterators[1], _iterators[4],},
-			value_t{_iterators[0], _iterators[1], _list.end(),},
-			value_t{_iterators[0], _iterators[2], _iterators[3],},
-			value_t{_iterators[0], _iterators[2], _iterators[4],},
-			value_t{_iterators[0], _iterators[2], _list.end(),},
-			value_t{_iterators[0], _iterators[3], _iterators[4],},
-			value_t{_iterators[0], _iterators[3], _list.end(),},
-			value_t{_iterators[0], _iterators[4], _list.end(),},
-			value_t{_iterators[0], _list.end(), _list.end(),},
 			value_t{_iterators[1], _iterators[2], _iterators[3],},
 			value_t{_iterators[1], _iterators[2], _iterators[4],},
 			value_t{_iterators[1], _iterators[2], _list.end(),},
@@ -169,16 +158,16 @@ namespace
 			std::make_pair(value_t{_iterators[0], _iterators[0], _iterators[4],}, true),
 			std::make_pair(value_t{_iterators[0], _iterators[0], _list.end(),}, true),
 			std::make_pair(value_t{_iterators[0], _iterators[1], _iterators[1],}, true),
-			std::make_pair(value_t{_iterators[0], _iterators[1], _iterators[2],}, false),
-			std::make_pair(value_t{_iterators[0], _iterators[1], _iterators[3],}, false),
-			std::make_pair(value_t{_iterators[0], _iterators[1], _iterators[4],}, false),
+			std::make_pair(value_t{_iterators[0], _iterators[1], _iterators[2],}, true),
+			std::make_pair(value_t{_iterators[0], _iterators[1], _iterators[3],}, true),
+			std::make_pair(value_t{_iterators[0], _iterators[1], _iterators[4],}, true),
 			std::make_pair(value_t{_iterators[0], _iterators[1], _list.end(),}, true),
 			std::make_pair(value_t{_iterators[0], _iterators[2], _iterators[2],}, true),
-			std::make_pair(value_t{_iterators[0], _iterators[2], _iterators[3],}, false),
-			std::make_pair(value_t{_iterators[0], _iterators[2], _iterators[4],}, false),
+			std::make_pair(value_t{_iterators[0], _iterators[2], _iterators[3],}, true),
+			std::make_pair(value_t{_iterators[0], _iterators[2], _iterators[4],}, true),
 			std::make_pair(value_t{_iterators[0], _iterators[2], _list.end(),}, true),
 			std::make_pair(value_t{_iterators[0], _iterators[3], _iterators[3],}, true),
-			std::make_pair(value_t{_iterators[0], _iterators[3], _iterators[4],}, false),
+			std::make_pair(value_t{_iterators[0], _iterators[3], _iterators[4],}, true),
 			std::make_pair(value_t{_iterators[0], _iterators[3], _list.end(),}, true),
 			std::make_pair(value_t{_iterators[0], _iterators[4], _iterators[4],}, true),
 			std::make_pair(value_t{_iterators[0], _iterators[4], _list.end(),}, true),
