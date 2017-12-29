@@ -9,81 +9,99 @@
 
 namespace rng
 {
-	class DynamicSeparate
-	{
-	public:
-		explicit DynamicSeparate(bool const separate) : _separate(separate) {}
-		
-		bool separate() const { return _separate; }
-		
-	private:
-		bool _separate;
-	};
+	////////////////////////////////////////////////////////////////
+	//dynamic/static behavior for independent facets of iterators
+	//Separate : wheter or not ranges may overlap
+	//Type : determines size and type of splits (integral numbers or iterators)
+	////////////////////////////////////////////////////////////////
 	
-	template<bool S>
-	class StaticSeparate
+	namespace dyn
 	{
-	public:
-		static constexpr bool separate() { return S; }
-	};
-	
-	template<typename T>
-	class DynamicSize
-	{
-	public:
-		using value_t = T;
-		using split_t = std::vector<T>;
-		
-	public:
-		DynamicSize(size_t const size) : _size(size)
+		class Separate
 		{
-			if(size == 0)
+		public:
+			explicit Separate(bool const separate) : _separate(separate) {}
+			
+			bool separate() const { return _separate; }
+			
+		private:
+			bool _separate;
+		};
+		
+		template<typename T>
+		class Type
+		{
+		public:
+			using value_t = T;
+			using split_t = std::vector<T>;
+			
+		public:
+			Type(size_t const size) : _size(size)
 			{
-				throw std::runtime_error("There must be at least one split");
+				if(size == 0)
+				{
+					throw std::runtime_error("There must be at least one split");
+				}
 			}
-		}
-	
-		size_t size() const { return _size; }
-		split_t split(T const &v) const { return split_t(_size, v); }
 		
-	private:
-		size_t _size;
-	};
+			size_t size() const { return _size; }
+			split_t split(T const &v) const { return split_t(_size, v); }
+			
+		private:
+			size_t _size;
+		};
+	}
 	
-	template<size_t N, typename T>
-	class StaticSize
+	namespace stat
 	{
-		static_assert(N > 0, "There must be at least one split");
-	public:
-		using value_t = T;
-		using split_t = std::array<T, N>;
+		template<bool S>
+		class Separate
+		{
+		public:
+			static constexpr bool separate() { return S; }
+		};
 		
-	public:		
-		static constexpr size_t size() { return N; }
-		
-		split_t split(T const &v) const { split_t res; res.fill(v); return res; }
-	};
+		template<size_t N, typename T>
+		class Type
+		{
+			static_assert(N > 0, "There must be at least one split");
+		public:
+			using value_t = T;
+			using split_t = std::array<T, N>;
+			
+		public:		
+			static constexpr size_t size() { return N; }
+			
+			split_t split(T const &v) const { split_t res; res.fill(v); return res; }
+		};
+	}
+
+	////////////////////////////////////////////////////////////////
+	//Forward declarations
+	////////////////////////////////////////////////////////////////
 	
 	template<typename T>
 	class range;
 	
-	template<typename separate_facet, typename size_facet>
+	template<typename separate_facet, typename type_facet>
 	class iterable;
 	
-	template<typename separate_facet, typename size_facet, typename T>
+	template<typename separate_facet, typename type_facet>
 	class iterator;
 	
 	template<typename split_t, typename T>
 	bool has_empty_range(split_t const&, range<T> const&);
 	
 	////////////////////////////////////////////////////////////////
+	//Class Definitions
+	////////////////////////////////////////////////////////////////
 	
-	template<typename separate_facet, typename size_facet, typename T>
+	template<typename separate_facet, typename type_facet>
 	class iterator
 	{
 	public:
-		using split_t = typename size_facet::split_t;
-		using iterable_t = iterable<separate_facet, size_facet>;
+		using split_t = typename type_facet::split_t;
+		using iterable_t = iterable<separate_facet, type_facet>;
 		
 	public:
 		iterator(iterator &&other) = default;
@@ -95,7 +113,7 @@ namespace rng
 		bool operator!=(iterator const &other) const { return _split != other._split; }
 		
 	private:
-        iterator(iterable_t const &i, T const &v) : _iterable(&i), _split(i.size_facet::split(v)) {}
+        iterator(iterable_t const &i, typename type_facet::value_t const &v) : _iterable(&i), _split(i.type_facet::split(v)) {}
 		
 	private:
 		iterable_t const *_iterable{};
@@ -117,22 +135,22 @@ namespace rng
 		
 	private:
 		template<typename, typename> friend class iterable;
-		template<typename, typename, typename> friend class iterator;
+		template<typename, typename> friend class iterator;
 		template<typename s, typename U> friend bool has_empty_range(s const&, range<U> const&);
 	};
 	
-	template<typename separate_facet, typename size_facet>
-	class iterable : private separate_facet, private size_facet
+	template<typename separate_facet, typename type_facet>
+	class iterable : private separate_facet, private type_facet
 	{
 	public:
-		using value_t = typename size_facet::value_t;
+		using value_t = typename type_facet::value_t;
 		using range_t = range<value_t>;
-		using iterator_t = iterator<separate_facet, size_facet, value_t>;
+		using iterator_t = iterator<separate_facet, type_facet>;
 		
 	public:
-		constexpr iterable(range_t const &r, separate_facet &&separate, size_facet &&size) : separate_facet(std::move(separate)), size_facet(std::move(size)), _range(r) {}
+		constexpr iterable(range_t const &r, separate_facet &&separate, type_facet &&size) : separate_facet(std::move(separate)), type_facet(std::move(size)), _range(r) {}
 		constexpr iterable(range_t const &r, separate_facet &&separate) : separate_facet(std::move(separate)), _range(r) {}
-		constexpr iterable(range_t const &r, size_facet &&size) : size_facet(std::move(size)), _range(r) {}
+		constexpr iterable(range_t const &r, type_facet &&size) : type_facet(std::move(size)), _range(r) {}
 		constexpr iterable(range_t const &r) : _range(r) {}
 		
 		iterator_t begin() const;
@@ -142,9 +160,13 @@ namespace rng
 		range_t _range;
 		
 	private:
-		template<typename, typename, typename> friend class iterator;
+		template<typename, typename> friend class iterator;
 	};
 }
+
+////////////////////////////////////////////////////////////////
+//Implementations	
+////////////////////////////////////////////////////////////////
 
 namespace rng
 {
@@ -160,14 +182,14 @@ namespace rng
 	template<typename T, typename std::enable_if<!std::is_integral<T>::value, int>::type = 0>
 	void rngadvance(T &a, size_t const d) { using std::advance; advance(a, d); }
 	
-	template<typename separate_facet, typename size_facet>
-	typename iterable<separate_facet, size_facet>::iterator_t iterable<separate_facet, size_facet>::begin() const
+	template<typename separate_facet, typename type_facet>
+	typename iterable<separate_facet, type_facet>::iterator_t iterable<separate_facet, type_facet>::begin() const
 	{
 		iterator_t res(*this, _range._begin);	
 		if(separate_facet::separate())
 		{
 			size_t const R = rngdistance(_range._begin, _range._end);
-			for(size_t i=0; i<size_facet::size(); ++i)
+			for(size_t i=0; i<type_facet::size(); ++i)
 			{
 				if(i + 1 < R)
 				{
@@ -183,19 +205,19 @@ namespace rng
 		return res;
 	}
 	
-	template<typename separate_facet, typename size_facet>
-	typename iterable<separate_facet, size_facet>::iterator_t iterable<separate_facet, size_facet>::end() const
+	template<typename separate_facet, typename type_facet>
+	typename iterable<separate_facet, type_facet>::iterator_t iterable<separate_facet, type_facet>::end() const
 	{
 		iterator_t res(*this, _range._begin);
 		res._split[0] = _range._end;
 		return res;
 	}
 	
-	template<typename separate_facet, typename size_facet, typename T>
-	iterator<separate_facet, size_facet, T> &iterator<separate_facet, size_facet, T>::operator++()
+	template<typename separate_facet, typename type_facet>
+	iterator<separate_facet, type_facet> &iterator<separate_facet, type_facet>::operator++()
 	{
 		iterator &res = *this;
-		size_t const N = res._iterable->size_facet::size();
+		size_t const N = res._iterable->type_facet::size();
 		
 		size_t i = 1;
 		for(; i <= N; ++i)
