@@ -371,9 +371,79 @@ namespace
 		EXPECT_EQ(index, expected.size());
 	}
 	
-	TEST(RangeIntegersTest, has_empty_range_static_size) {
+	TEST(RangeIntegersTest, has_empty_range_static_type) {
 		
 		using split_t = stat::Type<3, int>::split_t;
+		
+		std::array<std::pair<split_t, bool>, 56> const splits
+		{
+			std::make_pair(split_t{0, 0, 0,}, true),
+			std::make_pair(split_t{0, 0, 1,}, true),
+			std::make_pair(split_t{0, 0, 2,}, true),
+			std::make_pair(split_t{0, 0, 3,}, true),
+			std::make_pair(split_t{0, 0, 4,}, true),
+			std::make_pair(split_t{0, 0, 5,}, true),
+			std::make_pair(split_t{0, 1, 1,}, true),
+			std::make_pair(split_t{0, 1, 2,}, true),
+			std::make_pair(split_t{0, 1, 3,}, true),
+			std::make_pair(split_t{0, 1, 4,}, true),
+			std::make_pair(split_t{0, 1, 5,}, true),
+			std::make_pair(split_t{0, 2, 2,}, true),
+			std::make_pair(split_t{0, 2, 3,}, true),
+			std::make_pair(split_t{0, 2, 4,}, true),
+			std::make_pair(split_t{0, 2, 5,}, true),
+			std::make_pair(split_t{0, 3, 3,}, true),
+			std::make_pair(split_t{0, 3, 4,}, true),
+			std::make_pair(split_t{0, 3, 5,}, true),
+			std::make_pair(split_t{0, 4, 4,}, true),
+			std::make_pair(split_t{0, 4, 5,}, true),
+			std::make_pair(split_t{0, 5, 5,}, true),
+			std::make_pair(split_t{1, 1, 1,}, true),
+			std::make_pair(split_t{1, 1, 2,}, true),
+			std::make_pair(split_t{1, 1, 3,}, true),
+			std::make_pair(split_t{1, 1, 4,}, true),
+			std::make_pair(split_t{1, 1, 5,}, true),
+			std::make_pair(split_t{1, 2, 2,}, true),
+			std::make_pair(split_t{1, 2, 3,}, false),
+			std::make_pair(split_t{1, 2, 4,}, false),
+			std::make_pair(split_t{1, 2, 5,}, true),
+			std::make_pair(split_t{1, 3, 3,}, true),
+			std::make_pair(split_t{1, 3, 4,}, false),
+			std::make_pair(split_t{1, 3, 5,}, true),
+			std::make_pair(split_t{1, 4, 4,}, true),
+			std::make_pair(split_t{1, 4, 5,}, true),
+			std::make_pair(split_t{1, 5, 5,}, true),
+			std::make_pair(split_t{2, 2, 2,}, true),
+			std::make_pair(split_t{2, 2, 3,}, true),
+			std::make_pair(split_t{2, 2, 4,}, true),
+			std::make_pair(split_t{2, 2, 5,}, true),
+			std::make_pair(split_t{2, 3, 3,}, true),
+			std::make_pair(split_t{2, 3, 4,}, false),
+			std::make_pair(split_t{2, 3, 5,}, true),
+			std::make_pair(split_t{2, 4, 4,}, true),
+			std::make_pair(split_t{2, 4, 5,}, true),
+			std::make_pair(split_t{2, 5, 5,}, true),
+			std::make_pair(split_t{3, 3, 3,}, true),
+			std::make_pair(split_t{3, 3, 4,}, true),
+			std::make_pair(split_t{3, 3, 5,}, true),
+			std::make_pair(split_t{3, 4, 4,}, true),
+			std::make_pair(split_t{3, 4, 5,}, true),
+			std::make_pair(split_t{3, 5, 5,}, true),
+			std::make_pair(split_t{4, 4, 4,}, true),
+			std::make_pair(split_t{4, 4, 5,}, true),
+			std::make_pair(split_t{4, 5, 5,}, true),
+			std::make_pair(split_t{5, 5, 5,}, true),
+		};
+
+		for(auto const &pair : splits)
+		{
+			EXPECT_EQ(has_empty_range(pair.first, r), pair.second);
+		}
+	}
+	
+	TEST(RangeIntegersTest, has_empty_range_dynamic_type) {
+		
+		using split_t = dyn::Type<int>::split_t;
 		
 		std::array<std::pair<split_t, bool>, 56> const splits
 		{
