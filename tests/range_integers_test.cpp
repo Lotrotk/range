@@ -128,6 +128,7 @@ namespace
 	}
 	
 	TEST(RangeIntegersTest, has_empty_range) {
+		
 		std::array<std::pair<value_t, bool>, 56> const values
 		{
 			std::make_pair(value_t{0, 0, 0,}, true),
