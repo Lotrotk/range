@@ -89,14 +89,16 @@ There is also a function that can determine whether or not a split defines one o
 has_empty_range()
 ```
 
-The best part of this library is that the splits can be iterated in a ranged for loop:
+The best part of this library is that the splits can be iterated in a ranged for loop !
+Whether or not overlap is allowed and the number of splits can be (independently) set at compile time or at runtime.
+
 ```c++
 using namespace rng;
 
 range<int> const r(0, 5);
-using split_t = split<3, int>;
-	
-for(split_t const &s : iterable<false, 3, int>(r))//false : overlap is allowed, 3 : number of splits, int : split type, could also be an iterator
+
+//behavior completely defined at compile time
+for(auto const &s : iterable<stat::Separate<false>, stat::Type<3, int>>(r))
 {
 	std::cout << '{' << s[0] << ", " << s[1] << ", " << s[2] << '}' << std::endl;
 	if(has_empty_range(s, r))
@@ -106,4 +108,17 @@ for(split_t const &s : iterable<false, 3, int>(r))//false : overlap is allowed, 
 	
 	//do stuff
 }
+
+//behavior completely defined at runtime
+for(auto const &s : iterable<dyn::Separate, dyn::Type<int>>(r, dyn::Separate(false), dyn::Type<int>(3)))
+{
+	std::cout << '{' << s[0] << ", " << s[1] << ", " << s[2] << '}' << std::endl;
+	if(has_empty_range(s, r))
+	{
+		//continue;
+	}
+	
+	//do stuff
+}
+
 ```
