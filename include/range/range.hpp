@@ -17,10 +17,10 @@ namespace rng
 	class iterator;
 	
 	template<size_t N, typename T>
-	using value = std::array<T, N>;
+	using split = std::array<T, N>;
 	
 	template<size_t N, typename T>
-	bool has_empty_range(value<N, T> const&, range<T> const&);
+	bool has_empty_range(split<N, T> const&, range<T> const&);
 	
 	////////////////////////////////////////////////////////////////
 	
@@ -28,7 +28,7 @@ namespace rng
 	class iterator
 	{
 	public:
-		using value_t = value<N, T>;
+		using split_t = split<N, T>;
 		using range_t = range<T>;
 		
 	public:
@@ -37,7 +37,7 @@ namespace rng
 	
 		iterator &operator++();
 		
-        value_t const &operator*() const { return _array; }
+        split_t const &operator*() const { return _array; }
 		bool operator!=(iterator const &other) const { return _array != other._array; }
 		
 	private:
@@ -45,7 +45,7 @@ namespace rng
 		
 	private:
 		range_t const *_range{};
-		value_t _array;
+		split_t _array;
 		
 	private:
 		template<bool, size_t, typename> friend class iterable;
@@ -64,7 +64,7 @@ namespace rng
 	private:
 		template<bool, size_t, typename> friend class iterable;
 		template<bool, size_t, typename> friend class iterator;
-		template<size_t N, typename U> friend bool has_empty_range(value<N, U> const&, range<U> const&);
+		template<size_t N, typename U> friend bool has_empty_range(split<N, U> const&, range<U> const&);
 	};
 	
 	template<bool separate, size_t N, typename T>
@@ -74,7 +74,7 @@ namespace rng
 	public:
 		using range_t = range<T>;
 		using iterator_t = iterator<separate, N, T>;
-		using value_t = typename iterator_t::value_t;
+		using split_t = typename iterator_t::split_t;
 		
 	public:
 		constexpr iterable(range_t const &r) : _range(r) {}
@@ -166,7 +166,7 @@ namespace rng
 	}
 	
 	template<size_t N, typename T>
-	bool has_empty_range(value<N, T> const &v, range<T> const &r)
+	bool has_empty_range(split<N, T> const &v, range<T> const &r)
 	{
 		return
 			v.front() == r._begin
