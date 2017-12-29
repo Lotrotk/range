@@ -7,13 +7,31 @@
 
 namespace rng
 {
+	class DynamicSeparate
+	{
+	public:
+		explicit DynamicSeparate(bool const separate) : _separate(separate) {}
+		
+		bool separate() const { return _separate; }
+		
+	private:
+		bool _separate;
+	};
+	
+	template<bool S>
+	class StaticSeparate
+	{
+	public:
+		static constexpr bool separate() { return S; }
+	};
+	
 	template<typename T>
 	class range;
 	
-	template<bool separate, size_t N, typename T>
+	template<typename separate_facet, size_t N, typename T>
 	class iterable;
 	
-	template<bool separate, size_t N, typename T>
+	template<typename separate_facet, size_t N, typename T>
 	class iterator;
 	
 	template<size_t N, typename T>
@@ -24,12 +42,12 @@ namespace rng
 	
 	////////////////////////////////////////////////////////////////
 	
-	template<bool separate, size_t N, typename T>
+	template<typename separate_facet, size_t N, typename T>
 	class iterator
 	{
 	public:
 		using split_t = split<N, T>;
-		using range_t = range<T>;
+		using iterable_t = iterable<separate_facet, N, T>;
 		
 	public:
 		iterator(iterator &&other) = default;
@@ -41,14 +59,14 @@ namespace rng
 		bool operator!=(iterator const &other) const { return _array != other._array; }
 		
 	private:
-        iterator(range_t const &r, T const &v) : _range(&r) { _array.fill(v); }
+        iterator(iterable_t const &i, T const &v) : _iterable(&i) { _array.fill(v); }
 		
 	private:
-		range_t const *_range{};
+		iterable_t const *_iterable{};
 		split_t _array;
 		
 	private:
-		template<bool, size_t, typename> friend class iterable;
+		template<typename, size_t, typename> friend class iterable;
 	};
 	
 	template<typename T>
@@ -62,21 +80,22 @@ namespace rng
 		T _end;
 		
 	private:
-		template<bool, size_t, typename> friend class iterable;
-		template<bool, size_t, typename> friend class iterator;
+		template<typename, size_t, typename> friend class iterable;
+		template<typename, size_t, typename> friend class iterator;
 		template<size_t N, typename U> friend bool has_empty_range(split<N, U> const&, range<U> const&);
 	};
 	
-	template<bool separate, size_t N, typename T>
-	class iterable
+	template<typename separate_facet, size_t N, typename T>
+	class iterable : private separate_facet
 	{
 		static_assert(N > 0, "There must be at least one subrange");
 	public:
 		using range_t = range<T>;
-		using iterator_t = iterator<separate, N, T>;
+		using iterator_t = iterator<separate_facet, N, T>;
 		using split_t = typename iterator_t::split_t;
 		
 	public:
+		constexpr iterable(range_t const &r, separate_facet &&s) : separate_facet(std::move(s)), _range(r) {}
 		constexpr iterable(range_t const &r) : _range(r) {}
 		
 		iterator_t begin() const;
@@ -84,6 +103,9 @@ namespace rng
 		
 	private:
 		range_t _range;
+		
+	private:
+		template<typename, size_t, typename> friend class iterator;
 	};
 }
 
@@ -101,11 +123,11 @@ namespace rng
 	template<typename T, typename std::enable_if<!std::is_integral<T>::value, int>::type = 0>
 	void rngadvance(T &a, size_t const d) { using std::advance; advance(a, d); }
 	
-	template<bool separate, size_t N, typename T>
-	typename iterable<separate, N, T>::iterator_t iterable<separate, N, T>::begin() const
+	template<typename separate_facet, size_t N, typename T>
+	typename iterable<separate_facet, N, T>::iterator_t iterable<separate_facet, N, T>::begin() const
 	{
-		iterator_t res(_range, _range._begin);	
-		if(separate)
+		iterator_t res(*this, _range._begin);	
+		if(separate_facet::separate())
 		{
 			size_t const R = rngdistance(_range._begin, _range._end);
 			for(size_t i=0; i <N; ++i)
@@ -124,27 +146,27 @@ namespace rng
 		return res;
 	}
 	
-	template<bool separate, size_t N, typename T>
-	typename iterable<separate, N, T>::iterator_t iterable<separate, N, T>::end() const
+	template<typename separate_facet, size_t N, typename T>
+	typename iterable<separate_facet, N, T>::iterator_t iterable<separate_facet, N, T>::end() const
 	{
-		iterator_t res(_range, _range._begin);
+		iterator_t res(*this, _range._begin);
 		res._array[0] = _range._end;
 		return res;
 	}
 	
-	template<bool separate, size_t N, typename T>
-	iterator<separate, N, T> &iterator<separate, N, T>::operator++()
+	template<typename separate_facet, size_t N, typename T>
+	iterator<separate_facet, N, T> &iterator<separate_facet, N, T>::operator++()
 	{
 		iterator &res = *this;
 		
 		size_t i = 1;
 		for(; i <= N; ++i)
 		{
-			if(res._array[N-i] == res._range->_end)
+			if(res._array[N-i] == res._iterable->_range._end)
 			{
 				if(i == N)
 				{
-					res = iterable<separate, N, T>(*_range).end();
+					res = _iterable->end();
 					return res;
 				}
 				continue;
@@ -156,7 +178,7 @@ namespace rng
 		for(size_t j = N-i+1; j<N; ++j)
 		{
 			res._array[j] = res._array[j-1];
-			if(separate && res._array[j] != res._range->_end)
+			if(res._iterable->separate_facet::separate() && res._array[j] != res._iterable->_range._end)
 			{
 				rngadvance(res._array[j], size_t(1));
 			}
