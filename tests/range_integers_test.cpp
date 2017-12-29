@@ -9,9 +9,9 @@ namespace
 {
 	range<int> const r(0, 5);
 	
-	using split_t = split<3, int>;
-	
 	TEST(RangeIntegersTest, correct_static_overlapping_range) {
+		
+		using split_t = StaticSize<3, int>::split_t;
 		
 		std::array<split_t, 56> const expected
 		{
@@ -74,7 +74,7 @@ namespace
 		};
 		
 		size_t index = 0;
-		for(split_t const &comb : iterable<StaticSeparate<false>, 3, int>(r))
+		for(split_t const &comb : iterable<StaticSeparate<false>, StaticSize<3, int>>(r))
 		{
 			EXPECT_TRUE(index < expected.size());
 			EXPECT_EQ(comb, expected[index]);
@@ -85,6 +85,8 @@ namespace
 	
 	TEST(RangeIntegersTest, correct_dynamic_overlapping_range) {
 		
+		using split_t = StaticSize<3, int>::split_t;
+		
 		std::array<split_t, 56> const expected
 		{
 			split_t{0, 0, 0,},
@@ -146,7 +148,7 @@ namespace
 		};
 		
 		size_t index = 0;
-		for(split_t const &comb : iterable<DynamicSeparate, 3, int>(r, DynamicSeparate(false)))
+		for(split_t const &comb : iterable<DynamicSeparate, StaticSize<3, int>>(r, DynamicSeparate(false)))
 		{
 			EXPECT_TRUE(index < expected.size());
 			EXPECT_EQ(comb, expected[index]);
@@ -157,6 +159,8 @@ namespace
 
 	TEST(RangeIntegersTest, correct_static_not_overlapping_range) {
 		
+		using split_t = StaticSize<3, int>::split_t;
+		
 		std::array<split_t, 15> const expected
 		{
 			split_t{1, 2, 3,},
@@ -177,7 +181,7 @@ namespace
 		};
 		
 		size_t index = 0;
-		for(split_t const &comb : iterable<StaticSeparate<true>, 3, int>(r))
+		for(split_t const &comb : iterable<StaticSeparate<true>, StaticSize<3, int>>(r))
 		{
 			EXPECT_TRUE(index < expected.size());
 			EXPECT_EQ(comb, expected[index]);
@@ -188,6 +192,8 @@ namespace
 	
 	TEST(RangeIntegersTest, correct_dynamic_not_overlapping_range) {
 		
+		using split_t = StaticSize<3, int>::split_t;
+		
 		std::array<split_t, 15> const expected
 		{
 			split_t{1, 2, 3,},
@@ -208,7 +214,7 @@ namespace
 		};
 		
 		size_t index = 0;
-		for(split_t const &comb : iterable<DynamicSeparate, 3, int>(r, DynamicSeparate(true)))
+		for(split_t const &comb : iterable<DynamicSeparate, StaticSize<3, int>>(r, DynamicSeparate(true)))
 		{
 			EXPECT_TRUE(index < expected.size());
 			EXPECT_EQ(comb, expected[index]);
@@ -218,6 +224,8 @@ namespace
 	}
 	
 	TEST(RangeIntegersTest, has_empty_range) {
+		
+		using split_t = StaticSize<3, int>::split_t;
 		
 		std::array<std::pair<split_t, bool>, 56> const splits
 		{
